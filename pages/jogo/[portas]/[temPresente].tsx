@@ -4,28 +4,31 @@ import { atualizarPortas, criarPortas } from "@/functions/portas";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router"; 
+import PortaModel from "@/model/porta";
 
 export default function Jogo() {
 
   const router = useRouter()
-  const [portas, setPortas] = useState([])
+  const [portas, setPortas] = useState<PortaModel[]>([] as never[]);
   const [valido, setValido] = useState(false)
   
   useEffect(() => {
-    const portas = +router.query.portas
-    const temPresente = +router.query.temPresente
-    setPortas(criarPortas(portas, temPresente))
-  }, [router?.query])
+    const portasStr = router.query?.portas ?? undefined;
+    const portasNum = portasStr ? +portasStr : 0;
+    const temPresenteStr = router.query?.temPresente ?? '0';
+    const temPresenteNum = +temPresenteStr;    
+    setPortas(criarPortas(portasNum, temPresenteNum));
+  }, [router?.query]);
 
   useEffect(() => {
-    const portas = +router.query.portas
-    const temPresente = +router.query.temPresente
-
-    const qtdePortasValidas = portas >= 3 && portas <= 15
-    const temPresenteValido = temPresente >= 1 && temPresente <= portas
-
-    setValido(qtdePortasValidas && temPresenteValido)
-  }, [portas])
+    const portasStr = router.query?.portas ?? undefined;
+    const portasNum = portasStr ? +portasStr : 0;
+    const temPresenteStr = router.query?.temPresente ?? '0';
+    const temPresenteNum = +temPresenteStr;   
+    const qtdePortasValidas = portasNum !== undefined && portasNum >= 3 && portasNum <= 15;
+    const temPresenteValido = temPresenteNum !== undefined && temPresenteNum >= 1 && temPresenteNum <= portasNum;
+    setValido(qtdePortasValidas && temPresenteValido);
+  }, [portas]);
 
   function renderizarPortas() {
     return portas.map(porta => {
